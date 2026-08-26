@@ -167,6 +167,44 @@
   .cursor{display:inline-block; width:7px; height:14px; background:var(--accent); vertical-align:middle; animation:blink 1s step-start infinite;}
   @keyframes blink{50%{opacity:0;}}
   @keyframes appear{to{opacity:1;}}
+  @keyframes pageEnter{from{opacity:0; transform:translateY(12px);}to{opacity:1; transform:translateY(0);}}
+  @keyframes floatIn{0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);}}
+  @keyframes shimmer{from{background-position:200% 0;}to{background-position:-200% 0;}}
+  body{animation:pageEnter .7s ease both;}
+  .hero .terminal{animation:pageEnter .8s .18s ease both, floatIn 7s 1.2s ease-in-out infinite;}
+  .hero .avatar{animation:pageEnter .8s .08s ease both;}
+  .hero-cta .btn{transition:transform .18s ease, box-shadow .18s ease, background .18s ease;}
+  .hero-cta .btn:first-child{background-image:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%); background-size:220% 100%;}
+  .hero-cta .btn:first-child:hover{animation:shimmer 1s ease;}
+  .skill-card,.project-card,.profile-card,.contact-card{animation:pageEnter .65s ease both;}
+  .skill-card:nth-child(2),.project-card:nth-child(2){animation-delay:.08s;}
+  .skill-card:nth-child(3),.project-card:nth-child(3){animation-delay:.16s;}
+  .skill-card:nth-child(4){animation-delay:.24s;}
+  .skill-card:nth-child(5){animation-delay:.32s;}
+  .skill-card:nth-child(6){animation-delay:.4s;}
+  .project-card::before{
+    content:""; position:absolute; left:0; top:0; width:42px; height:2px;
+    background:var(--mint); box-shadow:0 0 10px rgba(127,216,196,.7);
+    animation:requestPulse 4.8s ease-in-out infinite;
+  }
+  .project-card:nth-child(2)::before{animation-delay:1.6s;}
+  .project-card:nth-child(3)::before{animation-delay:3.2s;}
+  .contact-card .method{animation:statusPulse 2.8s ease-in-out infinite; transform-origin:left center;}
+  @keyframes requestPulse{0%,15%{left:0; opacity:0;}25%{opacity:1;}75%{opacity:1;}85%,100%{left:calc(100% - 42px); opacity:0;}}
+  @keyframes statusPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+  body:not(.owner-mode) .avatar-upload,
+  body:not(.owner-mode) .avatar-overlay,
+  body:not(.owner-mode) .change-photo,
+  body:not(.owner-mode) .skill-remove-cat,
+  body:not(.owner-mode) [data-cat-edit],
+  body:not(.owner-mode) .skill-pill .x,
+  body:not(.owner-mode) #addCategoryCard,
+  body:not(.owner-mode) .project-actions,
+  body:not(.owner-mode) #addProjectTrigger,
+  body:not(.owner-mode) #projectForm{display:none !important;}
+  #ownerToggle{white-space:nowrap;}
+  #ownerToggle.owner-active{background:var(--mint-soft); border-color:var(--mint); color:#267A67;}
+  @media (prefers-reduced-motion: reduce){ body{animation:none;} .hero .terminal,.hero .avatar,.skill-card,.project-card,.profile-card,.contact-card,.project-card::before,.contact-card .method{animation:none;} }
 
   /* ---------- SECTION HEADERS ---------- */
   .section-eyebrow{font-family:var(--mono); font-size:12.5px; color:var(--accent-deep); letter-spacing:.04em; margin-bottom:10px; display:flex; align-items:center; gap:10px;}
@@ -324,6 +362,7 @@
       <a href="#contact">contact</a>
     </div>
     <a href="#contact" class="btn">Hire me →</a>
+    <button class="btn ghost small" id="ownerToggle" type="button">Owner login</button>
   </nav>
 </header>
 
@@ -531,6 +570,31 @@ function loadJSON(key, fallback){
 function saveJSON(key, val){
   try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
 }
+
+/* ============ OWNER MODE ============ */
+const OWNER_PASSWORD = 'Rohan2026!';
+const ownerToggle = document.getElementById('ownerToggle');
+function setOwnerMode(enabled){
+  document.body.classList.toggle('owner-mode', enabled);
+  ownerToggle.classList.toggle('owner-active', enabled);
+  ownerToggle.textContent = enabled ? 'Lock editing' : 'Owner login';
+}
+setOwnerMode(sessionStorage.getItem('rb_owner_mode') === 'true');
+ownerToggle.addEventListener('click', () => {
+  if(document.body.classList.contains('owner-mode')){
+    sessionStorage.removeItem('rb_owner_mode');
+    setOwnerMode(false);
+    closeProjectForm();
+    return;
+  }
+  const password = prompt('Owner password:');
+  if(password === OWNER_PASSWORD){
+    sessionStorage.setItem('rb_owner_mode', 'true');
+    setOwnerMode(true);
+  } else if(password !== null){
+    alert('Incorrect owner password.');
+  }
+});
 
 /* ============ DEFAULT DATA ============ */
 const DEFAULT_PROJECTS = [
