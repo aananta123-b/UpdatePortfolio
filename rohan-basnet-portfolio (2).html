@@ -172,7 +172,25 @@
   @keyframes shimmer{from{background-position:200% 0;}to{background-position:-200% 0;}}
   body{animation:pageEnter .7s ease both;}
   .hero .terminal{animation:pageEnter .8s .18s ease both, floatIn 7s 1.2s ease-in-out infinite;}
-  .hero .avatar{animation:pageEnter .8s .08s ease both;}
+  .hero .avatar{animation:pageEnter .8s .08s ease both, floatIn 5s 1s ease-in-out infinite;}
+  .accent-word{animation:accentGlow 3s ease-in-out infinite;}
+  .flight-path{
+    position:absolute; left:0; right:0; bottom:18px; height:48px; overflow:hidden;
+    pointer-events:none; z-index:2; opacity:.9;
+  }
+  .flight-path::before{
+    content:""; position:absolute; left:3%; right:3%; top:29px; border-top:2px dashed var(--mint);
+    opacity:.8; filter:drop-shadow(0 0 3px rgba(127,216,196,.35));
+  }
+  .flight-path::after{
+    content:"•  •  •  •  •  •  •  •  •"; position:absolute; left:3%; top:8px;
+    color:var(--mint); font-family:var(--mono); font-size:14px; letter-spacing:13px; opacity:.7;
+  }
+  .flight-path .plane{
+    position:absolute; top:3px; left:-28px; color:var(--accent-deep); font-size:25px; line-height:1;
+    filter:drop-shadow(0 3px 4px rgba(62,95,196,.22));
+    animation:flyAcross 11s linear infinite;
+  }
   .hero-cta .btn{transition:transform .18s ease, box-shadow .18s ease, background .18s ease;}
   .hero-cta .btn:first-child{background-image:linear-gradient(110deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%); background-size:220% 100%;}
   .hero-cta .btn:first-child:hover{animation:shimmer 1s ease;}
@@ -191,7 +209,9 @@
   .project-card:nth-child(3)::before{animation-delay:3.2s;}
   .contact-card .method{animation:statusPulse 2.8s ease-in-out infinite; transform-origin:left center;}
   @keyframes requestPulse{0%,15%{left:0; opacity:0;}25%{opacity:1;}75%{opacity:1;}85%,100%{left:calc(100% - 42px); opacity:0;}}
-  @keyframes statusPulse{0%,100%{opacity:1;}50%{opacity:.5;}}
+  @keyframes statusPulse{0%,100%{opacity:1; transform:scale(1);}50%{opacity:.55; transform:scale(1.03);}}
+  @keyframes accentGlow{0%,100%{text-shadow:0 0 0 rgba(91,127,222,0);}50%{text-shadow:0 0 18px rgba(91,127,222,.28);}}
+  @keyframes flyAcross{from{left:-28px; transform:rotate(2deg);}45%{transform:translateY(-8px) rotate(-2deg);}75%{transform:translateY(4px) rotate(2deg);}to{left:calc(100% + 28px); transform:translateY(0) rotate(-1deg);}}
   body:not(.owner-mode) .avatar-upload,
   body:not(.owner-mode) .avatar-overlay,
   body:not(.owner-mode) .change-photo,
@@ -204,7 +224,8 @@
   body:not(.owner-mode) #projectForm{display:none !important;}
   #ownerToggle{white-space:nowrap;}
   #ownerToggle.owner-active{background:var(--mint-soft); border-color:var(--mint); color:#267A67;}
-  @media (prefers-reduced-motion: reduce){ body{animation:none;} .hero .terminal,.hero .avatar,.skill-card,.project-card,.profile-card,.contact-card,.project-card::before,.contact-card .method{animation:none;} }
+  @media (max-width:560px){ .flight-path{bottom:12px; opacity:.7;} .flight-path::after{letter-spacing:7px;} }
+  @media (prefers-reduced-motion: reduce){ body{animation:none;} .hero .terminal,.hero .avatar,.accent-word,.skill-card,.project-card,.profile-card,.contact-card,.project-card::before,.contact-card .method,.flight-path .plane{animation:none;} }
 
   /* ---------- SECTION HEADERS ---------- */
   .section-eyebrow{font-family:var(--mono); font-size:12.5px; color:var(--accent-deep); letter-spacing:.04em; margin-bottom:10px; display:flex; align-items:center; gap:10px;}
@@ -370,6 +391,7 @@
 
   <!-- HERO -->
   <section class="hero" id="home">
+    <div class="flight-path" aria-hidden="true"><span class="plane">✈</span></div>
     <div>
       <div class="hero-id">
         <label class="avatar" id="avatarBox">
