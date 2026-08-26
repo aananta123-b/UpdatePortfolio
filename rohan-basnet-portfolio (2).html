@@ -379,7 +379,7 @@
           quietly depends on.
         </p>
         <p>
-          My recent work spans a property-listing backend (<b>Ghar Khoj</b>), a full-stack book rental platform, and a
+          My recent work spans a cargo tracking system for <b>Buddha Air</b>, a full-stack book rental platform, and a
           Java-based library system — each one has pushed me to think harder about data modeling, request handling,
           and writing APIs that are actually pleasant to consume.
         </p>
@@ -534,8 +534,8 @@ function saveJSON(key, val){
 
 /* ============ DEFAULT DATA ============ */
 const DEFAULT_PROJECTS = [
-  { title:"Ghar Khoj", method:"POST", route:"/api/projects/ghar-khoj",
-    desc:"Property and rental-listing platform connecting owners with seekers through structured search, clean data models, and REST endpoints for listings and inquiries.",
+  { title:"Cargo Tracking System (Buddha Air)", method:"POST", route:"/api/projects/buddha-air-cargo",
+    desc:"Cargo tracking platform for Buddha Air, providing structured shipment records, status updates, and REST endpoints for reliable cargo visibility.",
     stack:["Node.js","Express","MongoDB","JavaScript"], link:"" },
   { title:"Book Rental Platform", method:"GET", route:"/api/projects/book-rental",
     desc:"A full-stack rental system for books, handling user accounts, inventory, and rental/return flows with a REST API backing a React frontend.",
@@ -573,21 +573,22 @@ const snippets = [
     ['{',2],
     ['  "role": "Backend Developer",',3,'kv'],
     ['  "stack": ["Node.js", "Express", "MongoDB"],',4,'kv'],
-    ['  "currently_building": "Ghar Khoj",',5,'kv'],
+    ['  "currently_building": "Cargo Tracking System (Buddha Air)",',5,'kv'],
     ['  "status": "open_to_work"',6,'kv'],
     ['}',7],
     ['$ ',8,'cursorline']
   ],
   [
-    ['$ curl /api/projects/ghar-khoj',0],
+    ['$ curl /api/projects/buddha-air-cargo',0],
     ['// 200 OK · 37ms',1,'comment'],
     ['{',2],
-    ['  "type": "property-listing backend",',3,'kv'],
-    ['  "endpoints": ["/listings", "/search", "/inquiries"],',4,'kv'],
-    ['  "database": "MongoDB",',5,'kv'],
-    ['  "status": "in_progress"',6,'kv'],
-    ['}',7],
-    ['$ ',8,'cursorline']
+    ['  "type": "cargo tracking system",',3,'kv'],
+    ['  "airline": "Buddha Air",',4,'kv'],
+    ['  "endpoints": ["/shipments", "/tracking", "/status-updates"],',5,'kv'],
+    ['  "database": "MongoDB",',6,'kv'],
+    ['  "status": "in_progress"',7,'kv'],
+    ['}',8],
+    ['$ ',9,'cursorline']
   ],
   [
     ['$ curl /api/skills',0],
