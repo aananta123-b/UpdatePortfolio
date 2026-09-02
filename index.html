@@ -235,16 +235,6 @@ body{animation:pageEnter .7s ease both;}
 @keyframes statusPulse{0%,100%{opacity:1; transform:scale(1);}50%{opacity:.55; transform:scale(1.03);}}
 @keyframes accentGlow{0%,100%{text-shadow:0 0 0 rgba(108,142,245,0);}50%{text-shadow:0 0 18px rgba(108,142,245,.35);}}
 @keyframes flyAcross{from{left:-28px; transform:rotate(2deg);}45%{transform:translateY(-8px) rotate(-2deg);}75%{transform:translateY(4px) rotate(2deg);}to{left:calc(100% + 28px); transform:translateY(0) rotate(-1deg);}}
-body:not(.owner-mode) .avatar-upload,
-body:not(.owner-mode) .avatar-overlay,
-body:not(.owner-mode) .change-photo,
-body:not(.owner-mode) .skill-remove-cat,
-body:not(.owner-mode) [data-cat-edit],
-body:not(.owner-mode) .skill-pill .x,
-body:not(.owner-mode) #addCategoryCard,
-body:not(.owner-mode) .project-actions,
-body:not(.owner-mode) #addProjectTrigger,
-body:not(.owner-mode) #projectForm{display:none !important;}
 #ownerToggle{white-space:nowrap;}
 #ownerToggle.owner-active{background:var(--mint-soft); border-color:var(--mint); color:#59D9B3;}
 @media (max-width:560px){ .flight-path{bottom:12px; opacity:.7;} .flight-path::after{letter-spacing:7px;} }
@@ -427,7 +417,6 @@ footer p{margin-top:6px;}
 <div class="nav-links mobile-hide">
 <a href="#about">about</a>
 <a href="#skills">skills</a>
-<a href="#activity">activity</a>
 <a href="#projects">projects</a>
 <a href="#terminal-section">terminal</a>
 <a href="#contact">contact</a>
@@ -538,22 +527,6 @@ endpoint I write in Postman before I trust it.
 </div>
 </div>
 <div class="skills-grid" id="skillsGrid"></div>
-</section>
-
-<!-- ACTIVITY / GITHUB FEED -->
-<section id="activity">
-<div class="section-eyebrow">03 · activity</div>
-<h2 class="section-title">Recent GitHub activity.</h2>
-<p class="section-desc">Live public activity pulled straight from GitHub — pushes, new repos, and stars.</p>
-<div class="activity-card">
-<div class="activity-bar">
-<span class="label">$ curl https://api.github.com/users/aananta123-b/events/public</span>
-<button class="refresh" id="feedRefresh" type="button">↻ refresh</button>
-</div>
-<div class="feed-list" id="feedList">
-<div class="feed-empty">Loading recent activity…</div>
-</div>
-</div>
 </section>
 
 <!-- PROJECTS -->
@@ -686,28 +659,17 @@ themeToggle.addEventListener('click', () => {
 });
 
 /* ============ OWNER MODE ============ */
-const OWNER_PASSWORD = 'Rohan2026!';
 const ownerToggle = document.getElementById('ownerToggle');
 function setOwnerMode(enabled){
   document.body.classList.toggle('owner-mode', enabled);
   ownerToggle.classList.toggle('owner-active', enabled);
-  ownerToggle.textContent = enabled ? 'Lock editing' : 'Owner login';
+  ownerToggle.textContent = enabled ? 'Editing on' : 'Owner login';
 }
-setOwnerMode(sessionStorage.getItem('rb_owner_mode') === 'true');
+setOwnerMode(true);
 ownerToggle.addEventListener('click', () => {
-  if(document.body.classList.contains('owner-mode')){
-    sessionStorage.removeItem('rb_owner_mode');
-    setOwnerMode(false);
-    closeProjectForm();
-    return;
-  }
-  const password = prompt('Owner password:');
-  if(password === OWNER_PASSWORD){
-    sessionStorage.setItem('rb_owner_mode', 'true');
-    setOwnerMode(true);
-  } else if(password !== null){
-    alert('Incorrect owner password.');
-  }
+  const nextState = !document.body.classList.contains('owner-mode');
+  setOwnerMode(nextState);
+  if(!nextState){ closeProjectForm(); }
 });
 
 /* ============ DEFAULT DATA ============ */
@@ -1029,74 +991,6 @@ pfSubmit.addEventListener('click', () => {
   renderProjects();
   closeProjectForm();
 });
-
-/* ============ GITHUB ACTIVITY FEED ============ */
-const feedList = document.getElementById('feedList');
-const feedRefresh = document.getElementById('feedRefresh');
-const GITHUB_USER = 'aananta123-b';
-
-function timeAgo(dateStr){
-  const diffMs = Date.now() - new Date(dateStr).getTime();
-  const mins = Math.floor(diffMs / 60000);
-  if(mins < 60) return mins + 'm ago';
-  const hrs = Math.floor(mins / 60);
-  if(hrs < 24) return hrs + 'h ago';
-  const days = Math.floor(hrs / 24);
-  if(days < 30) return days + 'd ago';
-  return new Date(dateStr).toLocaleDateString();
-}
-function describeEvent(ev){
-  const repo = ev.repo ? ev.repo.name : 'a repository';
-  switch(ev.type){
-    case 'PushEvent': {
-      const n = (ev.payload && ev.payload.commits) ? ev.payload.commits.length : 0;
-      return `Pushed ${n || ''} commit${n===1?'':'s'} to ${repo}`;
-    }
-    case 'CreateEvent':
-      return `Created ${ev.payload && ev.payload.ref_type ? ev.payload.ref_type : 'ref'} in ${repo}`;
-    case 'WatchEvent':
-      return `Starred ${repo}`;
-    case 'ForkEvent':
-      return `Forked ${repo}`;
-    case 'IssuesEvent':
-      return `${ev.payload && ev.payload.action} an issue in ${repo}`;
-    case 'PullRequestEvent':
-      return `${ev.payload && ev.payload.action} a pull request in ${repo}`;
-    case 'IssueCommentEvent':
-      return `Commented on an issue in ${repo}`;
-    default:
-      return `${ev.type.replace('Event','')} activity in ${repo}`;
-  }
-}
-async function loadGithubFeed(){
-  feedList.innerHTML = '<div class="feed-empty">Loading recent activity…</div>';
-  try{
-    const res = await fetch(`https://api.github.com/users/${GITHUB_USER}/events/public?per_page=6`);
-    if(!res.ok) throw new Error('bad status');
-    const events = await res.json();
-    if(!Array.isArray(events) || events.length === 0){
-      feedList.innerHTML = '<div class="feed-empty">No recent public activity — check back soon.</div>';
-      return;
-    }
-    feedList.innerHTML = '';
-    events.slice(0,6).forEach(ev => {
-      const row = document.createElement('div');
-      row.className = 'feed-row';
-      row.innerHTML = `
-        <span class="feed-dot"></span>
-        <div class="feed-main">
-          <div class="feed-title">${escHtml(describeEvent(ev))}</div>
-          <div class="feed-meta">${escHtml(timeAgo(ev.created_at))} · @${escHtml(ev.actor ? ev.actor.login : GITHUB_USER)}</div>
-        </div>
-      `;
-      feedList.appendChild(row);
-    });
-  }catch(err){
-    feedList.innerHTML = `<div class="feed-empty">Couldn't reach GitHub right now — <a href="https://github.com/${GITHUB_USER}" target="_blank" rel="noopener" style="color:var(--accent-deep);">view profile directly ↗</a></div>`;
-  }
-}
-loadGithubFeed();
-feedRefresh.addEventListener('click', loadGithubFeed);
 
 /* ============ COPY EMAIL ============ */
 const copyEmailBtn = document.getElementById('copyEmailBtn');
